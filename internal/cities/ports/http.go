@@ -25,14 +25,15 @@ func NewHandler(cityService app.CityService) CityHandler {
 
 func (h *handler) CreateCity(w http.ResponseWriter, r *http.Request) {
 	var c app.City
-
 	err := json.NewDecoder(r.Body).Decode(&c)
 	if err != nil {
+		h.cityService.Logger.Error(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	err = h.cityService.CreateCity(r.Context(), c)
 	if err != nil {
+		h.cityService.Logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -44,6 +45,7 @@ func (h *handler) FindCityByUUID(w http.ResponseWriter, r *http.Request) {
 
 	city, err := h.cityService.FindCityByUUID(r.Context(), uuid)
 	if err != nil {
+		h.cityService.Logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -56,6 +58,7 @@ func (h *handler) AllCities(w http.ResponseWriter, r *http.Request) {
 
 	cities, err := h.cityService.AllCities(r.Context())
 	if err != nil {
+		h.cityService.Logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -69,6 +72,7 @@ func (h *handler) DeleteCity(w http.ResponseWriter, r *http.Request) {
 
 	err := h.cityService.DeleteCity(r.Context(), uuid)
 	if err != nil {
+		h.cityService.Logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
