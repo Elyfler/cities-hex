@@ -34,9 +34,9 @@ func main() {
 	}))
 
 	r.Post("/cities", handler.CreateCity)
-	r.Get("/cities/{uuid}", handler.FindCityByUUID)
+	r.Get("/cities/{name}", handler.FindCityByName)
 	r.Get("/cities", handler.AllCities)
-	r.Delete("/cities/{uuid}", handler.DeleteCity)
+	r.Delete("/cities/{name}", handler.DeleteCity)
 
 	http.ListenAndServe("127.0.0.1:8000", r)
 }

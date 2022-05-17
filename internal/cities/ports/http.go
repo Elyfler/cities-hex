@@ -11,6 +11,7 @@ import (
 type CityHandler interface {
 	CreateCity(http.ResponseWriter, *http.Request)
 	FindCityByUUID(http.ResponseWriter, *http.Request)
+	FindCityByName(http.ResponseWriter, *http.Request)
 	AllCities(http.ResponseWriter, *http.Request)
 	DeleteCity(http.ResponseWriter, *http.Request)
 }
@@ -54,6 +55,19 @@ func (h *handler) FindCityByUUID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(city)
 }
 
+func (h *handler) FindCityByName(w http.ResponseWriter, r *http.Request) {
+	name := chi.URLParam(r, "name")
+
+	city, err := h.cityService.FindCityByName(r.Context(), name)
+	if err != nil {
+		h.cityService.Logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(city)
+}
 func (h *handler) AllCities(w http.ResponseWriter, r *http.Request) {
 
 	cities, err := h.cityService.AllCities(r.Context())
@@ -68,9 +82,9 @@ func (h *handler) AllCities(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) DeleteCity(w http.ResponseWriter, r *http.Request) {
 
-	uuid := chi.URLParam(r, "uuid")
+	name := chi.URLParam(r, "name")
 
-	err := h.cityService.DeleteCity(r.Context(), uuid)
+	err := h.cityService.DeleteCity(r.Context(), name)
 	if err != nil {
 		h.cityService.Logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

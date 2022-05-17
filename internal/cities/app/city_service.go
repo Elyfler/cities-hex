@@ -11,8 +11,9 @@ import (
 type cityRepository interface {
 	CreateCity(ctx context.Context, city City) error
 	FindCityByUUID(ctx context.Context, uuid string) (City, error)
+	FindCityByName(ctx context.Context, name string) (City, error)
 	AllCities(ctx context.Context) ([]City, error)
-	DeleteCity(ctx context.Context, cityUUID string) error
+	DeleteCity(ctx context.Context, name string) error
 }
 
 type CityService struct {
@@ -50,12 +51,17 @@ func (c CityService) FindCityByUUID(ctx context.Context, uuid string) (City, err
 	return c.repo.FindCityByUUID(ctx, uuid)
 }
 
+func (c CityService) FindCityByName(ctx context.Context, name string) (City, error) {
+	c.Logger.Info("Finding city", zap.String("Name", name))
+	return c.repo.FindCityByName(ctx, name)
+}
+
 func (c CityService) AllCities(ctx context.Context) ([]City, error) {
 	c.Logger.Info("Finding all cities")
 	return c.repo.AllCities(ctx)
 }
 
-func (c CityService) DeleteCity(ctx context.Context, uuid string) error {
-	c.Logger.Info("Deleting city", zap.String("UUID", uuid))
-	return c.repo.DeleteCity(ctx, uuid)
+func (c CityService) DeleteCity(ctx context.Context, name string) error {
+	c.Logger.Info("Deleting city", zap.String("Name", name))
+	return c.repo.DeleteCity(ctx, name)
 }

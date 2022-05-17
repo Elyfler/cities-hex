@@ -54,7 +54,7 @@ func (s SQLCityRepository) CreateCity(ctx context.Context, city app.City) error 
 
 func (s SQLCityRepository) FindCityByUUID(ctx context.Context, uuid string) (app.City, error) {
 
-	rows, err := s.db.NamedQueryContext(ctx, "SELECT * FROM cities WHERE post_code = $1", uuid)
+	rows, err := s.db.QueryxContext(ctx, "SELECT * FROM cities WHERE uuid = $1", uuid)
 	if err != nil {
 		return app.City{}, err
 	}
@@ -71,6 +71,24 @@ func (s SQLCityRepository) FindCityByUUID(ctx context.Context, uuid string) (app
 	return dbCity.toCity(), nil
 }
 
+func (s SQLCityRepository) FindCityByName(ctx context.Context, name string) (app.City, error) {
+
+	rows, err := s.db.QueryxContext(ctx, "SELECT * FROM cities WHERE name = $1", name)
+	if err != nil {
+		return app.City{}, err
+	}
+
+	var dbCity cityModel
+
+	for rows.Next() {
+		err = rows.StructScan(&dbCity)
+		if err != nil {
+			return app.City{}, err
+		}
+	}
+
+	return dbCity.toCity(), nil
+}
 func (s SQLCityRepository) AllCities(ctx context.Context) ([]app.City, error) {
 
 	rows, err := s.db.QueryxContext(ctx, "SELECT * FROM cities")
@@ -93,9 +111,9 @@ func (s SQLCityRepository) AllCities(ctx context.Context) ([]app.City, error) {
 	return cities, nil
 }
 
-func (s SQLCityRepository) DeleteCity(ctx context.Context, uuid string) error {
+func (s SQLCityRepository) DeleteCity(ctx context.Context, name string) error {
 
-	_, err := s.db.QueryxContext(ctx, `DELETE FROM cities WHERE uuid = $1`, uuid)
+	_, err := s.db.QueryxContext(ctx, `DELETE FROM cities WHERE name = $1`, name)
 	if err != nil {
 		return err
 	}
