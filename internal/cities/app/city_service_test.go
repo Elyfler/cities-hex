@@ -82,12 +82,32 @@ func TestCreateCity(t *testing.T) {
 	ctx := context.Background()
 	svc := setupService()
 
+	testCases := []struct {
+		testName string
+		city     app.City
+		err      error
+	}{
+		{"A city should not be saved with an empty name",
+			app.City{Name: "", PostCode: 12345},
+			app.ErrEmptyCityName},
+		{"A city should not be saved with a name too long",
+			app.City{Name: "jadoremangerlesenfantsavecunebonnesauce", PostCode: 12345},
+			app.ErrCityNameTooLong},
+	}
+
+	for _, tc := range testCases {
+
+		t.Run(tc.testName, func(t *testing.T) {
+			err := svc.CreateCity(ctx, tc.city)
+			if err != tc.err {
+				t.Errorf("Expected err: %v, got: %v", tc.err, err)
+			}
+
+		})
+	}
 	t.Run("A city saved should be found by its name", func(t *testing.T) {
 		city := app.City{Name: "city", PostCode: 12345}
-		err := svc.CreateCity(ctx, city)
-		if err != nil {
-			t.Error(err)
-		}
+		svc.CreateCity(ctx, city)
 
 		cityRet, err := svc.FindCityByName(ctx, city.Name)
 		if err != nil {
@@ -99,8 +119,8 @@ func TestCreateCity(t *testing.T) {
 		if city.PostCode != cityRet.PostCode {
 			t.Errorf("got: %v, expected: %v", cityRet.PostCode, city.PostCode)
 		}
-
 	})
+
 }
 
 func TestDeleteCity(t *testing.T) {

@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"errors"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -36,8 +35,10 @@ func NewCityService(
 func (c CityService) CreateCity(ctx context.Context, city City) error {
 	// Small sanity check
 	if len(city.Name) > 25 {
-		err := errors.New("City name too big")
-		return err
+		return ErrCityNameTooLong
+	}
+	if len(city.Name) == 0 {
+		return ErrEmptyCityName
 	}
 	city.UUID = uuid.New().String()
 
